@@ -1,0 +1,12 @@
+{
+  "jest.debugCodeLens.showWhenTestStateIn": [
+    "fail",
+    "unknown",
+    "pass",
+    "skip"
+  ],
+  "jest.jestCommandLine": "npm test --",
+  "css.validate": false, // Disable css built-in lint
+  "stylelint.enable": true, // Enable sytlelint
+  "scss.validate": false, // Disable scss lint (optional if using scss)
+}
