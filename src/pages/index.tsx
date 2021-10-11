@@ -1,10 +1,6 @@
 import Page from 'components/Page';
-import HomeScene from 'scenes/HomeScene';
+import clientConfig from 'config/clientConfig';
 
 export default function HomePage() {
-  return (
-    <Page title="Bares">
-      <HomeScene />
-    </Page>
-  );
+  return <Page title={clientConfig.storeName}></Page>;
 }
