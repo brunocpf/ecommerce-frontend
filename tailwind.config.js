@@ -6,8 +6,8 @@ module.exports = {
   darkMode: 'media', // or 'media' or 'class'
   theme: {
     fontFamily: {
-      sans: ['Merriweather Sans', 'sans-serif'],
-      serif: ['Merriweather', 'serif'],
+      sans: ['Poppins', 'sans-serif'],
+      serif: ['Poppins', 'serif'],
     },
     extend: {},
     colors: {
@@ -23,7 +23,8 @@ module.exports = {
       borderWidth: ['hover'],
       ring: ['hover', 'focus', 'active'],
       textColor: ['active'],
+      opacity: ['active'],
     },
   },
-  plugins: [require('@tailwindcss/forms')],
+  plugins: [require('@tailwindcss/forms'), require('@tailwindcss/line-clamp')],
 };

@@ -1,9 +1,8 @@
 import { Children } from 'react';
 import { motion } from 'framer-motion';
 
-export interface ResponsiveListProps {
-  children: React.ReactElement[];
-}
+export interface ResponsiveListProps {}
+
 const container = {
   hidden: { opacity: 1, scale: 0 },
   visible: {
@@ -27,7 +26,7 @@ const item = {
 const ResponsiveList: React.FC<ResponsiveListProps> = ({ children }) => {
   return (
     <motion.ul
-      className="grid list-none gap-4 lg:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+      className="grid list-none gap-4 lg:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
       variants={container}
       initial="hidden"
       animate="visible"

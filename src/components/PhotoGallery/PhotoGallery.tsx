@@ -5,12 +5,6 @@ import { wrap } from 'popmotion';
 import styles from './PhotoGallery.module.css';
 import { useEffect } from 'react';
 
-const images = [
-  'https://d33wubrfki0l68.cloudfront.net/dd23708ebc4053551bb33e18b7174e73b6e1710b/dea24/static/images/wallpapers/shared-colors@2x.png',
-  'https://d33wubrfki0l68.cloudfront.net/49de349d12db851952c5556f3c637ca772745316/cfc56/static/images/wallpapers/bridge-02@2x.png',
-  'https://d33wubrfki0l68.cloudfront.net/594de66469079c21fc54c14db0591305a1198dd6/3f4b1/static/images/wallpapers/bridge-01@2x.png',
-];
-
 const variants = {
   enter: (direction: number) => {
     return {
@@ -43,9 +37,23 @@ const swipePower = (offset: number, velocity: number) => {
   return Math.abs(offset) * velocity;
 };
 
-export interface PhotoGalleryProps {}
+export interface PhotoGalleryProps {
+  images: string[];
+  auto?: boolean;
+  autoDelay?: number;
+  showArrowButtons?: boolean;
+  showNavDots?: boolean;
+  onClickImage?: (index: number, url: string) => void;
+}
 
-const PhotoGallery: React.FC<PhotoGalleryProps> = () => {
+const PhotoGallery: React.FC<PhotoGalleryProps> = ({
+  images,
+  auto,
+  autoDelay = 5000,
+  showArrowButtons = true,
+  showNavDots = false,
+  onClickImage,
+}) => {
   const [[page, direction], setPage] = useState([0, 0]);
 
   // We only have 3 images, but we paginate them absolutely (ie 1, 2, 3, 4, 5...) and
@@ -62,49 +70,82 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = () => {
   );
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      paginate(1);
-    }, 5000);
+    if (auto && images.length > 1) {
+      const timeout = setTimeout(() => {
+        paginate(1);
+      }, autoDelay);
 
-    return () => clearTimeout(timeout);
-  }, [paginate]);
+      return () => clearTimeout(timeout);
+    }
+    return;
+  }, [auto, autoDelay, images.length, paginate]);
+
+  const ContainerComponent = onClickImage ? 'button' : 'div';
 
   return (
     <>
       <AnimatePresence initial={false} custom={direction}>
-        <motion.img
-          key={page}
-          src={images[imageIndex]}
-          custom={direction}
-          variants={variants}
-          initial="enter"
-          animate="center"
-          exit="exit"
-          transition={{
-            x: { type: 'spring', stiffness: 300, damping: 30 },
-            opacity: { duration: 0.2 },
-          }}
-          drag="x"
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={1}
-          onDragEnd={(_, { offset, velocity }) => {
-            const swipe = swipePower(offset.x, velocity.x);
+        <ContainerComponent
+          className="absolute active:opacity-80 hover:opacity-50 cursor-pointer transition-opacity w-full max-w-screen h-full"
+          onClick={() => onClickImage?.(imageIndex, images[imageIndex])}
+        >
+          <motion.img
+            key={page}
+            src={images[imageIndex]}
+            custom={direction}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{
+              x: { type: 'spring', stiffness: 300, damping: 30 },
+              opacity: { duration: 0.2 },
+            }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={1}
+            onDragEnd={(_, { offset, velocity }) => {
+              const swipe = swipePower(offset.x, velocity.x);
 
-            if (swipe < -swipeConfidenceThreshold) {
-              paginate(1);
-            } else if (swipe > swipeConfidenceThreshold) {
-              paginate(-1);
-            }
-          }}
-          className={styles.galleryImg}
-        />
+              if (swipe < -swipeConfidenceThreshold) {
+                paginate(1);
+              } else if (swipe > swipeConfidenceThreshold) {
+                paginate(-1);
+              }
+            }}
+            className={`${styles.galleryImg} ${
+              onClickImage != null ? 'relative inset-0' : ''
+            } ${showNavDots ? 'pb-6' : ''}`}
+          />
+        </ContainerComponent>
       </AnimatePresence>
-      <div className={styles.next} onClick={() => paginate(1)}>
-        {'‣'}
-      </div>
-      <div className={styles.prev} onClick={() => paginate(-1)}>
-        {'‣'}
-      </div>
+      {showArrowButtons && (
+        <>
+          <div className={styles.next} onClick={() => paginate(1)}>
+            {'‣'}
+          </div>
+          <div className={styles.prev} onClick={() => paginate(-1)}>
+            {'‣'}
+          </div>
+        </>
+      )}
+      {showNavDots && (
+        <div className="flex w-full absolute bottom-0 cursor-pointer justify-center gap-2">
+          {images.map((_, i) => (
+            <div
+              key={i}
+              className={`${
+                imageIndex === i
+                  ? 'bg-white border-gray-200 border-2'
+                  : 'bg-gray-200'
+              } h-6 w-6 rounded-full active:opacity-80 hover:opacity-50 cursor-pointer transition-opacity`}
+              onClick={() => {
+                if (imageIndex != i) setPage([i, imageIndex > i ? -1 : 1]);
+              }}
+            />
+          ))}
+        </div>
+      )}
     </>
   );
 };

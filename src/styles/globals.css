@@ -6,8 +6,6 @@ html,
 body {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
 a {
@@ -19,44 +17,10 @@ a {
   box-sizing: border-box;
 }
 
-.iconShadow {
-  filter: drop-shadow(0px 0px 4px var(--tw-ring-color));
-}
-
-.iconButton.highlightCurrent:before {
-  background-color: theme('colors.gray.800');
-}
-
-.iconButton:before,
-.iconButton:before {
-  content: '';
-  position: absolute;
-  inset: -0.5rem;
-  background-color: theme('colors.gray.800');
-  opacity: 0;
-  border-radius: 100%;
-  transition: all 100ms ease-in;
-}
-
-.iconButton:hover:before,
-.iconButton:focus:before {
-  opacity: 0.4;
-  transition: all 100ms ease-out;
-}
-
-@layer utilities {
-  @variants responsive {
-    .text-shadow {
-      text-shadow: 0px 0px 4px var(--tw-ring-color);
-    }
-    .text-shadow-md {
-      text-shadow: 4px 4px 8px var(--tw-ring-color);
-    }
-    .text-shadow-lg {
-      text-shadow: 15px 15px 30px var(--tw-ring-color);
-    }
-    .text-shadow-none {
-      text-shadow: none;
-    }
-  }
+::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  height: 24px;
+  width: 24px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23777'><path d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/></svg>");
+  cursor: pointer;
 }

@@ -4,7 +4,7 @@ import config from 'config';
 import { NextPage } from 'next';
 import withApollo from 'util/withApollo';
 
-const HomePage: NextPage = () => {
+const SearchPage: NextPage = () => {
   return (
     <Page title={config.public.storeName}>
       <SearchScene />
@@ -12,4 +12,4 @@ const HomePage: NextPage = () => {
   );
 };
 
-export default withApollo({ ssr: true })(HomePage);
+export default withApollo({ ssr: true })(SearchPage);
