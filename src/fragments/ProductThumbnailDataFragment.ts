@@ -9,6 +9,7 @@ export default gql`
     inStock
     brand {
       name
+      slug
     }
     images(limit: 1) {
       caption

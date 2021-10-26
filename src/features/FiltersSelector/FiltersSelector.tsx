@@ -3,7 +3,6 @@ import { gql, useQuery } from '@apollo/client';
 import CustomCheckbox from 'components/CustomCheckbox';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
-import { btoa } from 'isomorphic-base64';
 import useQueryFilters from './useQueryFilters';
 import { MouseEventHandler } from 'react';
 import useQueryString from 'util/useQueryString';
@@ -21,7 +20,10 @@ const FILTER_OPTIONS_QUERY = gql`
   }
 `;
 
-export interface FiltersSelectorProps {}
+export interface FiltersSelectorProps {
+  onClickFilter?: () => void;
+  onClickClear?: () => void;
+}
 
 export type FiltersSelectorOptions = {
   brands?: {
@@ -35,7 +37,10 @@ export type FiltersSelectorOptions = {
   showOutOfStockItems?: boolean;
 };
 
-const FiltersSelector: React.FC<FiltersSelectorProps> = () => {
+const FiltersSelector: React.FC<FiltersSelectorProps> = ({
+  onClickClear,
+  onClickFilter,
+}) => {
   const { data } = useQuery<FilterOptionsQuery>(FILTER_OPTIONS_QUERY);
   const { push, query } = useRouter();
   const search = useQueryString('search');
@@ -47,7 +52,9 @@ const FiltersSelector: React.FC<FiltersSelectorProps> = () => {
   });
 
   const onSubmit = (f: FiltersSelectorOptions) => {
-    const encodedFilters = btoa(JSON.stringify(f));
+    const encodedFilters = encodeURIComponent(JSON.stringify(f));
+
+    onClickFilter?.();
 
     push('/produtos', {
       query: {
@@ -58,9 +65,7 @@ const FiltersSelector: React.FC<FiltersSelectorProps> = () => {
     });
   };
 
-  const onClear: MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault();
-
+  const onClear: MouseEventHandler<HTMLButtonElement> = () => {
     setValue('maxPrice', '');
     setValue('maxPriceToggle', false);
     setValue('showOutOfStockItems', false);
@@ -74,6 +79,12 @@ const FiltersSelector: React.FC<FiltersSelectorProps> = () => {
     for (const category of categories) {
       setValue(`categories.${category?.slug}`, false);
     }
+
+    onClickClear?.();
+
+    push('/produtos', {
+      query: {},
+    });
   };
 
   return (
@@ -147,6 +158,7 @@ const FiltersSelector: React.FC<FiltersSelectorProps> = () => {
           <button
             className="w-full h-full p-2 rounded text-white bg-gray-400 active:opacity-80 hover:opacity-50 transition-opacity"
             onClick={onClear}
+            type="reset"
           >
             Limpar Filtros
           </button>

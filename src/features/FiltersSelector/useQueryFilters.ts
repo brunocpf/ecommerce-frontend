@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { atob } from 'isomorphic-base64';
 import { FiltersSelectorOptions } from './FiltersSelector';
 import useQueryString from 'util/useQueryString';
 
@@ -8,7 +7,13 @@ const useQueryFilters = () => {
 
   return useMemo(() => {
     if (typeof queryFilters === 'string') {
-      return JSON.parse(atob(queryFilters)) as FiltersSelectorOptions;
+      try {
+        return JSON.parse(
+          decodeURIComponent(queryFilters),
+        ) as FiltersSelectorOptions;
+      } catch {
+        return undefined;
+      }
     }
     return undefined;
   }, [queryFilters]);

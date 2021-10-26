@@ -1,13 +1,13 @@
 import Page from 'components/Page';
-import SearchScene from 'scenes/SearchScene';
 import config from 'config';
 import { NextPage } from 'next';
+import HomeScene from 'scenes/HomeScene';
 import withApollo from 'util/withApollo';
 
 const HomePage: NextPage = () => {
   return (
     <Page title={config.public.storeName}>
-      <SearchScene />
+      <HomeScene />
     </Page>
   );
 };

@@ -1,11 +1,11 @@
 import { gql, useQuery } from '@apollo/client';
-import { ProductPageNameQuery } from 'api';
+import { ProductPageNameQuery, ProductPageNameQueryVariables } from 'api';
+import Page from 'components/Page';
+import config from 'config';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import Page from 'components/Page';
 import ProductScene from 'scenes/ProductScene';
 import withApollo from 'util/withApollo';
-import config from 'config';
 
 export interface ProductPageProps {}
 
@@ -21,14 +21,14 @@ const ProductPage: NextPage<ProductPageProps> = () => {
   const {
     query: { id },
   } = useRouter();
-  const { data, loading, error } = useQuery<ProductPageNameQuery>(
-    PRODUCT_PAGE_NAME_QUERY,
-    {
-      variables: {
-        id,
-      },
+  const { data, loading, error } = useQuery<
+    ProductPageNameQuery,
+    ProductPageNameQueryVariables
+  >(PRODUCT_PAGE_NAME_QUERY, {
+    variables: {
+      id: id?.toString() ?? '',
     },
-  );
+  });
 
   return (
     <Page

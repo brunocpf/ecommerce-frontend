@@ -20,10 +20,11 @@ module.exports = {
     extend: {
       backgroundColor: ['active'],
       backgroundOpacity: ['active'],
-      borderWidth: ['hover'],
+      borderWidth: ['hover', 'active'],
       ring: ['hover', 'focus', 'active'],
       textColor: ['active'],
-      opacity: ['active'],
+      opacity: ['active', 'disabled'],
+      outline: ['active'],
     },
   },
   plugins: [require('@tailwindcss/forms'), require('@tailwindcss/line-clamp')],

@@ -36,7 +36,7 @@ const ProductThumbnail: React.FC<ProductThumbnailProps> = ({
       passHref
     >
       <a className="bg-red-500">
-        <div className="relative flex flex-col gap-2 w-full rounded-3xl p-8 border-2 border-gray-200 hover:opacity-50 active:opacity-80 transition-opacity">
+        <div className="relative flex flex-col gap-2 w-full rounded-3xl p-8 shadow border-gray-200 hover:opacity-50 active:opacity-80 transition-opacity">
           <div className="flex items-center justify-center w-full">
             <div className="w-36 h-36 relative mb-4">
               <Image
@@ -62,15 +62,12 @@ const ProductThumbnail: React.FC<ProductThumbnailProps> = ({
                   {inStock ? currencyFormatter.format(price) : 'Indisponível'}
                 </div>
               </div>
-              <button className="font-semibold text-sm rounded-2xl p-2 border-2 border-gray-200">
-                Ver Detalhes
-              </button>
             </div>
           </div>
           {featured && (
             <div className="absolute right-4 top-4 flex flex-col items-center text-emerald-500">
               <StarIcon className="h-6 w-6" />
-              <span className="text-xs">Destaque</span>
+              <label className="text-xs">Destaque</label>
             </div>
           )}
         </div>

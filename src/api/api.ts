@@ -4,6 +4,32 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL query operation: MeQuery
+// ====================================================
+
+export interface MeQuery_me_user {
+  __typename: "UsersPermissionsUser";
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+export interface MeQuery_me {
+  __typename: "UsersPermissionsMe";
+  user: MeQuery_me_user | null;
+}
+
+export interface MeQuery {
+  me: MeQuery_me | null;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL query operation: FilterOptionsQuery
 // ====================================================
 
@@ -30,6 +56,43 @@ export interface FilterOptionsQuery {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL mutation operation: LoginUser
+// ====================================================
+
+export interface LoginUser_login_user_user {
+  __typename: "UsersPermissionsUser";
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+export interface LoginUser_login_user {
+  __typename: "UsersPermissionsMe";
+  user: LoginUser_login_user_user | null;
+}
+
+export interface LoginUser_login {
+  __typename: "UsersPermissionsLoginPayload";
+  jwt: string | null;
+  user: LoginUser_login_user;
+}
+
+export interface LoginUser {
+  login: LoginUser_login;
+}
+
+export interface LoginUserVariables {
+  identifier: string;
+  password: string;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL query operation: ProductPageNameQuery
 // ====================================================
 
@@ -44,6 +107,55 @@ export interface ProductPageNameQuery {
 
 export interface ProductPageNameQueryVariables {
   id: string;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL query operation: CartItemsQuery
+// ====================================================
+
+export interface CartItemsQuery_products_brand {
+  __typename: "Brand";
+  name: string | null;
+  slug: string;
+}
+
+export interface CartItemsQuery_products_category {
+  __typename: "Category";
+  name: string;
+  slug: string;
+}
+
+export interface CartItemsQuery_products_images {
+  __typename: "UploadFile";
+  caption: string | null;
+  alternativeText: string | null;
+  url: string;
+  formats: any | null;
+}
+
+export interface CartItemsQuery_products {
+  __typename: "Product";
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  inStock: boolean;
+  brand: CartItemsQuery_products_brand | null;
+  category: CartItemsQuery_products_category | null;
+  images: (CartItemsQuery_products_images | null)[] | null;
+}
+
+export interface CartItemsQuery {
+  products: (CartItemsQuery_products | null)[] | null;
+}
+
+export interface CartItemsQueryVariables {
+  ids?: string[] | null;
 }
 
 /* tslint:disable */
@@ -108,6 +220,7 @@ export interface ProductPageQueryVariables {
 export interface SearchProductsQuery_searchResults_brand {
   __typename: "Brand";
   name: string | null;
+  slug: string;
 }
 
 export interface SearchProductsQuery_searchResults_images {
@@ -153,6 +266,7 @@ export interface SearchProductsQueryVariables {
 export interface ProductThumbnailDataFragment_brand {
   __typename: "Brand";
   name: string | null;
+  slug: string;
 }
 
 export interface ProductThumbnailDataFragment_images {

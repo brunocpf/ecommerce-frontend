@@ -1,5 +1,5 @@
 import { gql, useQuery } from '@apollo/client';
-import { ProductPageQuery } from 'api';
+import { ProductPageQuery, ProductPageQueryVariables } from 'api';
 import PhotoGallery from 'components/PhotoGallery';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -8,7 +8,7 @@ import currencyFormatter from 'util/currencyFormatter';
 import Spinner from 'components/Spinner';
 import { ExclamationCircleIcon, StarIcon } from '@heroicons/react/outline';
 import { useMemo } from 'react';
-import { btoa } from 'isomorphic-base64';
+import { useCartContext } from 'features/Cart/CartContext';
 
 const PRODUCT_PAGE_QUERY = gql`
   query ProductPageQuery($id: ID!) {
@@ -41,19 +41,21 @@ export interface ProductSceneProps {}
 
 const ProductScene: React.FC<ProductSceneProps> = () => {
   const {
+    push,
     query: { id },
   } = useRouter();
-  const { data, loading, error } = useQuery<ProductPageQuery>(
-    PRODUCT_PAGE_QUERY,
-    {
-      variables: {
-        id,
-      },
+  const { data, loading, error } = useQuery<
+    ProductPageQuery,
+    ProductPageQueryVariables
+  >(PRODUCT_PAGE_QUERY, {
+    variables: {
+      id: id?.toString() ?? '',
     },
-  );
+  });
+  const { addItem } = useCartContext();
 
   const categoryFilter = useMemo(() => {
-    return btoa(
+    return encodeURIComponent(
       JSON.stringify({
         categories: {
           [data?.product?.category?.slug ?? '-']: true,
@@ -63,7 +65,7 @@ const ProductScene: React.FC<ProductSceneProps> = () => {
   }, [data?.product?.category?.slug]);
 
   const brandFilter = useMemo(() => {
-    return btoa(
+    return encodeURIComponent(
       JSON.stringify({
         brands: {
           [data?.product?.brand?.slug ?? '-']: true,
@@ -71,6 +73,14 @@ const ProductScene: React.FC<ProductSceneProps> = () => {
       }),
     );
   }, [data?.product?.brand?.slug]);
+
+  const addToCart = () => {
+    if (data?.product?.id) {
+      addItem(data.product.id, 1);
+
+      push('/carrinho');
+    }
+  };
 
   if (error)
     return (
@@ -108,7 +118,7 @@ const ProductScene: React.FC<ProductSceneProps> = () => {
         )}
 
         <div className="h-full flex flex-col md:flex-row md:gap-5 relative pb-64">
-          <div className="h-96 w-full relative mb-4">
+          <div className="h-96 w-full sm:w-auto sm:flex-1 relative mb-4">
             {data?.product?.images && (
               <PhotoGallery
                 images={data?.product?.images.map(i =>
@@ -120,7 +130,7 @@ const ProductScene: React.FC<ProductSceneProps> = () => {
               />
             )}
           </div>
-          <div className="md:mt-4 md:z-10 bg-white relative">
+          <div className="md:mt-4 sm:flex-1 md:z-10 bg-white relative">
             <div>
               {data?.product?.brand && (
                 <p className="text-sm">
@@ -147,6 +157,7 @@ const ProductScene: React.FC<ProductSceneProps> = () => {
                     data?.product?.inStock ? 'bg-emerald-500' : 'bg-red-500'
                   }`}
                   disabled={!data?.product?.inStock}
+                  onClick={addToCart}
                 >
                   <span className="font-bold">
                     {data?.product?.inStock
@@ -164,7 +175,7 @@ const ProductScene: React.FC<ProductSceneProps> = () => {
               {data?.product?.featured && (
                 <div className="absolute right-4 top-4 flex flex-col items-center text-emerald-500">
                   <StarIcon className="h-6 w-6" />
-                  <span className="text-xs">Destaque</span>
+                  <label className="text-xs">Destaque</label>
                 </div>
               )}
             </div>
@@ -177,6 +188,7 @@ const ProductScene: React.FC<ProductSceneProps> = () => {
                 data?.product?.inStock ? 'bg-emerald-500' : 'bg-red-500'
               }`}
               disabled={!data?.product?.inStock}
+              onClick={addToCart}
             >
               <span className="font-bold">
                 {data?.product?.inStock

@@ -6,6 +6,10 @@ import ProductThumbnailDataFragment from 'fragments/ProductThumbnailDataFragment
 import getAbsoluteImageUrl from 'util/getAbsoluteImageUrl';
 import {
   AdjustmentsIcon,
+  ChevronDoubleLeftIcon,
+  ChevronDoubleRightIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
   ExclamationCircleIcon,
 } from '@heroicons/react/outline';
 import Spinner from 'components/Spinner';
@@ -13,6 +17,8 @@ import FiltersSelector, { useQueryFilters } from 'features/FiltersSelector';
 import { useMemo, useState } from 'react';
 import SearchBar, { useQuerySearch } from 'features/SearchBar';
 import Drawer from 'components/Drawer';
+import useQuerySearchPage from 'features/SearchBar/useQuerySearchPage';
+import Link from 'next/link';
 
 export interface HomeSceneProps {}
 
@@ -70,7 +76,17 @@ const SearchScene: React.FC<HomeSceneProps> = () => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const queryFilters = useQueryFilters();
   const querySearch = useQuerySearch();
-  const startOffset = 0;
+  const queryPage = useQuerySearchPage();
+  const startOffset = (queryPage - 1) * 8;
+
+  const queryObject = useMemo(() => {
+    return {
+      filters: queryFilters
+        ? encodeURIComponent(JSON.stringify(queryFilters))
+        : '',
+      search: encodeURIComponent(querySearch?.search ?? ''),
+    };
+  }, [queryFilters, querySearch?.search]);
 
   const categories = useMemo(() => {
     if (!queryFilters?.categories) return undefined;
@@ -106,6 +122,8 @@ const SearchScene: React.FC<HomeSceneProps> = () => {
     },
   });
 
+  const lastPage = Math.ceil((data?.count ?? 1) / 8);
+
   if (error)
     return (
       <div className="p-4 flex items-center gap-2 text-red-400">
@@ -117,7 +135,10 @@ const SearchScene: React.FC<HomeSceneProps> = () => {
   return (
     <div className="my-4 flex gap-4">
       <Drawer open={drawerIsOpen} onClose={() => setDrawerIsOpen(false)}>
-        <FiltersSelector />
+        <FiltersSelector
+          onClickClear={() => setDrawerIsOpen(false)}
+          onClickFilter={() => setDrawerIsOpen(false)}
+        />
       </Drawer>
       <div className="hidden md:block pr-8 border-r-2 border-gray-200">
         <FiltersSelector />
@@ -133,45 +154,135 @@ const SearchScene: React.FC<HomeSceneProps> = () => {
           <SearchBar />
         </div>
         <section className="mb-4">
-          <h1 className="text-bold text-xl select-none mb-1 text-center sm:text-left">
-            Resultados
-            {data?.searchResults?.length == 0 ? (
-              <div className="text-xs text-gray-500">
-                Nenhum produto encontrado
-              </div>
-            ) : (
-              <div className="text-xs text-gray-500">
-                Mostrando {startOffset + 1} -{' '}
-                {startOffset + (data?.searchResults?.length ?? 0)} de{' '}
-                {data?.count}
-              </div>
-            )}
-          </h1>
           {loading ? (
             <div className="w-full flex items-center justify-center py-10">
               <Spinner className="text-black h-20 w-20" />
             </div>
           ) : (
-            <ResponsiveList>
-              {data?.searchResults?.map(p => (
-                <ProductThumbnail
-                  key={p?.id}
-                  id={p?.id ?? ''}
-                  name={p?.name ?? ''}
-                  image={{
-                    alt: p?.images?.[0]?.alternativeText ?? '',
-                    caption: p?.images?.[0]?.caption ?? '',
-                    url: getAbsoluteImageUrl(
-                      p?.images?.[0]?.formats?.thumbnail?.url ?? '',
-                    ),
+            <>
+              {querySearch?.search && (
+                <div className="text-xs italic text-gray-500 mb-2">
+                  {`Exibindo produtos contendo "${querySearch.search}"`}
+                </div>
+              )}
+              <h1 className="text-bold text-xl select-none mb-1 text-center sm:text-left">
+                Resultados
+                {data?.searchResults?.length == 0 ? (
+                  <div className="text-xs text-gray-500">
+                    Nenhum produto encontrado
+                  </div>
+                ) : (
+                  <div className="text-xs text-gray-500">
+                    Mostrando {startOffset + 1} -{' '}
+                    {startOffset + (data?.searchResults?.length ?? 0)} de{' '}
+                    {data?.count}
+                  </div>
+                )}
+              </h1>
+              <ResponsiveList>
+                {data?.searchResults?.map(p => (
+                  <ProductThumbnail
+                    key={p?.id}
+                    id={p?.id ?? ''}
+                    name={p?.name ?? ''}
+                    image={{
+                      alt: p?.images?.[0]?.alternativeText ?? '',
+                      caption: p?.images?.[0]?.caption ?? '',
+                      url: getAbsoluteImageUrl(
+                        p?.images?.[0]?.formats?.thumbnail?.url ?? '',
+                      ),
+                    }}
+                    price={p?.price ?? 0}
+                    featured={p?.featured ?? false}
+                    brand={p?.brand?.name ?? ''}
+                    inStock={p?.inStock ?? false}
+                  />
+                ))}
+              </ResponsiveList>
+              <div className="mt-4 w-full flex justify-center items-center select-none">
+                <Link
+                  href={{
+                    pathname: '/produtos',
+                    query: {
+                      ...queryObject,
+                      page: 1,
+                    },
                   }}
-                  price={p?.price ?? 0}
-                  featured={p?.featured ?? false}
-                  brand={p?.brand?.name ?? ''}
-                  inStock={p?.inStock ?? false}
-                />
-              ))}
-            </ResponsiveList>
+                  passHref
+                  scroll={false}
+                >
+                  <a
+                    className={`flex items-center justify-center gap-2 active:opacity-80 hover:opacity-50 cursor-pointer transition-opacity ${
+                      queryPage <= 1 ? 'pointer-events-none text-gray-200' : ''
+                    }`}
+                  >
+                    <ChevronDoubleLeftIcon className="h-8 w-8" />
+                  </a>
+                </Link>
+                <Link
+                  href={{
+                    pathname: '/produtos',
+                    query: {
+                      ...queryObject,
+                      page: Math.max(queryPage - 1, 1),
+                    },
+                  }}
+                  passHref
+                  scroll={false}
+                >
+                  <a
+                    className={`flex items-center justify-center gap-2 active:opacity-80 hover:opacity-50 cursor-pointer transition-opacity ${
+                      queryPage <= 1 ? 'pointer-events-none text-gray-200' : ''
+                    }`}
+                  >
+                    <ChevronLeftIcon className="h-8 w-8" />
+                  </a>
+                </Link>
+                Página {queryPage}
+                <Link
+                  href={{
+                    pathname: '/produtos',
+                    query: {
+                      ...queryObject,
+                      page: Math.min(queryPage + 1, lastPage),
+                    },
+                  }}
+                  passHref
+                  scroll={false}
+                >
+                  <a
+                    className={`flex items-center justify-center gap-2 active:opacity-80 hover:opacity-50 cursor-pointer transition-opacity ${
+                      queryPage >= lastPage
+                        ? 'pointer-events-none text-gray-200'
+                        : ''
+                    }`}
+                  >
+                    <ChevronRightIcon className="h-8 w-8" />
+                  </a>
+                </Link>
+                <Link
+                  href={{
+                    pathname: '/produtos',
+                    query: {
+                      ...queryObject,
+                      page: lastPage,
+                    },
+                  }}
+                  passHref
+                  scroll={false}
+                >
+                  <a
+                    className={`flex items-center justify-center gap-2 active:opacity-80 hover:opacity-50 cursor-pointer transition-opacity ${
+                      queryPage >= lastPage
+                        ? 'pointer-events-none text-gray-200'
+                        : ''
+                    }`}
+                  >
+                    <ChevronDoubleRightIcon className="h-8 w-8" />
+                  </a>
+                </Link>
+              </div>
+            </>
           )}
         </section>
       </div>

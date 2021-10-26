@@ -16,12 +16,14 @@ const SearchBar: React.FC<SearchBarProps> = () => {
 
   const defaultValues = useQuerySearch();
 
-  const { register, handleSubmit } = useForm<SearchFormValues>({
+  const { register, handleSubmit, setValue } = useForm<SearchFormValues>({
     defaultValues,
   });
 
   const onSubmit = (d: SearchFormValues) => {
     const encodedSearch = encodeURIComponent(d.search);
+
+    setValue('search', '');
 
     push('/produtos', {
       query: {

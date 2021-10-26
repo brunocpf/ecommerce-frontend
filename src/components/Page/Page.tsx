@@ -1,4 +1,11 @@
 import Head from 'next/head';
+import { motion } from 'framer-motion';
+
+const variants = {
+  hidden: { opacity: 0, x: 0, y: 0 },
+  enter: { opacity: 1, x: 0, y: 0 },
+  exit: { opacity: 0, x: 0, y: -100 },
+};
 
 export interface PageProps {
   title: string;
@@ -15,7 +22,16 @@ const Page: React.FC<PageProps> = ({ children, title, description }) => {
         )}
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {children}
+      <motion.main
+        initial="hidden"
+        animate="enter"
+        exit="exit"
+        variants={variants}
+        transition={{ type: 'ease-in-out' }}
+        className="min-h-screen w-full"
+      >
+        {children}
+      </motion.main>
     </>
   );
 };

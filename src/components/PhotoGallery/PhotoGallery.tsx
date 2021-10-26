@@ -86,7 +86,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
     <>
       <AnimatePresence initial={false} custom={direction}>
         <ContainerComponent
-          className="absolute active:opacity-80 hover:opacity-50 cursor-pointer transition-opacity w-full max-w-screen h-full"
+          className="absolute overflow-hidden active:opacity-80 hover:opacity-50 cursor-pointer transition-opacity w-full max-w-screen h-full"
           onClick={() => onClickImage?.(imageIndex, images[imageIndex])}
         >
           <motion.img
@@ -130,7 +130,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
         </>
       )}
       {showNavDots && (
-        <div className="flex w-full absolute bottom-0 cursor-pointer justify-center gap-2">
+        <div className="flex w-full absolute bottom-0 cursor-pointer justify-center gap-2 z-10">
           {images.map((_, i) => (
             <div
               key={i}

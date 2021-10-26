@@ -4,6 +4,8 @@ const config = {
     graphqlEndpoint:
       process.env.GRAPHQL_ENDPOINT ?? 'http://localhost:1337/graphql',
     apiUrl: process.env.API_URL ?? 'http://localhost:1337',
+    phoneNumber: process.env.PHONE_NUMBER ?? '(99) 9999-9999',
+    whatsApp: process.env.WHATSAPP ?? '(99) 9999-9999',
   },
 };
 
