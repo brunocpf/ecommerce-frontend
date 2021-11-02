@@ -9,6 +9,8 @@ import Spinner from 'components/Spinner';
 import { ExclamationCircleIcon, StarIcon } from '@heroicons/react/outline';
 import { useMemo } from 'react';
 import { useCartContext } from 'features/Cart/CartContext';
+import Container from 'components/Container';
+import ActionButton from 'components/ActionButton';
 
 const PRODUCT_PAGE_QUERY = gql`
   query ProductPageQuery($id: ID!) {
@@ -99,7 +101,7 @@ const ProductScene: React.FC<ProductSceneProps> = () => {
 
   return (
     <>
-      <div className="my-4">
+      <Container className="mt-4 bg-white shadow rounded p-4">
         {data?.product?.category && (
           <p className="text-xs mb-2">
             {'>>'} Ver mais{' '}
@@ -110,14 +112,14 @@ const ProductScene: React.FC<ProductSceneProps> = () => {
               }}
               passHref
             >
-              <a className="text-emerald-500 font-bold underline">
+              <a className="text-orange-500 font-bold underline">
                 {data?.product?.category?.name}
               </a>
             </Link>
           </p>
         )}
 
-        <div className="h-full flex flex-col md:flex-row md:gap-5 relative pb-64">
+        <div className="h-full flex flex-col md:flex-row md:gap-5 relative mb-80 md:mb-0">
           <div className="h-96 w-full sm:w-auto sm:flex-1 relative mb-4">
             {data?.product?.images && (
               <PhotoGallery
@@ -141,7 +143,7 @@ const ProductScene: React.FC<ProductSceneProps> = () => {
                     }}
                     passHref
                   >
-                    <a className="text-emerald-500 font-bold underline">
+                    <a className="text-orange-500 font-bold underline">
                       {data?.product?.brand?.name}
                     </a>
                   </Link>
@@ -152,10 +154,9 @@ const ProductScene: React.FC<ProductSceneProps> = () => {
               </p>
 
               <div className="hidden md:block my-10">
-                <button
-                  className={`w-full h-full rounded py-4 text-white text-lg active:opacity-80 hover:opacity-50 transition-opacity ${
-                    data?.product?.inStock ? 'bg-emerald-500' : 'bg-red-500'
-                  }`}
+                <ActionButton
+                  className="w-full h-full rounded py-4"
+                  variant={!data?.product?.inStock ? 'error' : 'primary'}
                   disabled={!data?.product?.inStock}
                   onClick={addToCart}
                 >
@@ -168,12 +169,12 @@ const ProductScene: React.FC<ProductSceneProps> = () => {
                     {' - '}
                     Adicionar ao carrinho
                   </span>
-                </button>
+                </ActionButton>
               </div>
 
               <p>{data?.product?.description}</p>
               {data?.product?.featured && (
-                <div className="absolute right-4 top-4 flex flex-col items-center text-emerald-500">
+                <div className="absolute right-4 top-4 flex flex-col items-center text-orange-500">
                   <StarIcon className="h-6 w-6" />
                   <label className="text-xs">Destaque</label>
                 </div>
@@ -183,10 +184,9 @@ const ProductScene: React.FC<ProductSceneProps> = () => {
         </div>
         <div className="md:hidden bottom-0 left-0 fixed h-64 w-full bg-gradient-to-t from-white via-white to-transparent grid grid-rows-2 z-10">
           <div className="row-start-2 p-8">
-            <button
-              className={`w-full h-full rounded text-white active:opacity-80 hover:opacity-50 transition-opacity ${
-                data?.product?.inStock ? 'bg-emerald-500' : 'bg-red-500'
-              }`}
+            <ActionButton
+              className="w-full h-full rounded"
+              variant={!data?.product?.inStock ? 'error' : 'primary'}
               disabled={!data?.product?.inStock}
               onClick={addToCart}
             >
@@ -199,10 +199,10 @@ const ProductScene: React.FC<ProductSceneProps> = () => {
                 {' - '}
                 Adicionar ao carrinho
               </span>
-            </button>
+            </ActionButton>
           </div>
         </div>
-      </div>
+      </Container>
     </>
   );
 };

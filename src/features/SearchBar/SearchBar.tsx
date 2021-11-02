@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { SearchIcon } from '@heroicons/react/outline';
 import { useRouter } from 'next/router';
+import ActionButton from 'components/ActionButton';
 import useQuerySearch from './useQuerySearch';
 import useQueryString from 'util/useQueryString';
 
@@ -11,8 +12,9 @@ type SearchFormValues = {
 };
 
 const SearchBar: React.FC<SearchBarProps> = () => {
-  const { push, query } = useRouter();
+  const { push } = useRouter();
   const filters = useQueryString('filters');
+  const sort = useQueryString('sort');
 
   const defaultValues = useQuerySearch();
 
@@ -25,9 +27,10 @@ const SearchBar: React.FC<SearchBarProps> = () => {
 
     setValue('search', '');
 
-    push('/produtos', {
+    push({
+      pathname: '/produtos',
       query: {
-        ...query,
+        sort,
         filters,
         search: encodedSearch,
       },
@@ -39,10 +42,16 @@ const SearchBar: React.FC<SearchBarProps> = () => {
       action="busca"
       role="search"
       noValidate
-      className="w-full max-w-lg"
+      className="w-full"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className="flex focus-within:ring-2 focus-within:ring-gray-500 bg-gray-100 rounded-xl">
+      <div className="flex ring-1 ring-gray-200 focus-within:ring-1 focus-within:ring-blue-500 bg-white rounded w-full">
+        <button
+          className="bg-transparent w-auto flex justify-end items-center text-orange-500 p-2 hover:text-orange-400"
+          type="submit"
+        >
+          <SearchIcon className="h-6 w-6" />
+        </button>
         <input
           className="w-full p-2 outline-none border-none focus:ring-0 bg-transparent"
           type="search"
@@ -55,12 +64,11 @@ const SearchBar: React.FC<SearchBarProps> = () => {
           enterKeyHint="go"
           {...register('search')}
         />
-        <button
-          className="bg-transparent w-auto flex justify-end items-center text-gray-500 p-2 hover:text-gray-400"
-          type="submit"
-        >
-          <SearchIcon className="h-6 w-6" />
-        </button>
+        <div className="p-1">
+          <ActionButton className="text-sm" variant="primary">
+            Buscar
+          </ActionButton>
+        </div>
       </div>
     </form>
   );

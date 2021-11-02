@@ -23,10 +23,19 @@ class MyDocument extends Document {
           <link rel="manifest" href="/manifest.json" />
           <meta name="theme-color" content="#8b5cf6" />
         </Head>
-        <body className="bg-white text-gray-700">
+        <body className="bg-fixed bg-gray-200 bg text-indigo-900">
           <Main />
           <NextScript />
         </body>
+        <style jsx>
+          {`
+            .bg {
+              background: linear-gradient(45deg, #e4e4e7 70%, #1c58da 70%);
+              background-size: cover;
+              background-attachment: fixed;
+            }
+          `}
+        </style>
       </Html>
     );
   }

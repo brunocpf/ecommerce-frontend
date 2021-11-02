@@ -1,39 +1,31 @@
 import { MinusIcon, PlusIcon, TrashIcon } from '@heroicons/react/outline';
+import { CartItemFragment } from 'api';
 import { useCartContext } from 'features/Cart';
+import gql from 'graphql-tag';
 import Image from 'next/image';
 import Link from 'next/link';
+import calculatePrice from 'util/calculatePrice';
 import currencyFormatter from 'util/currencyFormatter';
+import getAbsoluteImageUrl from 'util/getAbsoluteImageUrl';
 
 export interface CartItemProps {
-  id: string;
-  name: string;
-  price: number;
-  brand?: string;
-  image: {
-    alt: string;
-    caption: string;
-    url: string;
-  };
+  product: CartItemFragment;
 }
 
-const CartItem: React.FC<CartItemProps> = ({
-  id,
-  name,
-  price,
-  brand,
-  image,
+const CartItem: ComponentWithFragment<CartItemProps> = ({
+  product: { id, name, price, brand, images, discount },
 }) => {
   const { items, addItem, removeItem } = useCartContext();
-
+  const finalPrice = calculatePrice(price, discount);
   const itemQuantity = items.filter(q => q === id).length;
 
   return (
-    <div className="relative flex gap-2 w-full rounded-3xl p-4 shadow border-gray-200">
+    <div className="relative flex bg-white gap-2 w-full rounded-3xl p-4 shadow border-gray-200">
       <div className="flex items-center justify-center w-36 h-36 relative">
         <Image
           className="pointer-events-none"
-          src={image.url}
-          alt={image.alt}
+          src={getAbsoluteImageUrl(images?.[0]?.url ?? '')}
+          alt={images?.[0]?.alternativeText ?? ''}
           layout="fill"
         />
       </div>
@@ -46,18 +38,18 @@ const CartItem: React.FC<CartItemProps> = ({
           passHref
         >
           <a>
-            <div className="text-xs">{brand ?? '-'}</div>
+            <div className="text-xs">{brand?.name ?? '-'}</div>
             <p className="text-lg font-bold line-clamp-2">{name}</p>
           </a>
         </Link>
         <div className="w-full mt-4 flex gap-4 items-center text-sm">
-          <div className="text-gray-300">
+          <div>
             <div className="text-xs">Preço</div>
-            {currencyFormatter.format(price)}
+            {currencyFormatter.format(finalPrice)}
           </div>
-          <div className="text-lg font-bold">
+          <div className="text-lg font-bold text-orange-500">
             <div className="text-xs">Total</div>
-            {currencyFormatter.format(price * itemQuantity)}
+            {currencyFormatter.format(finalPrice * itemQuantity)}
           </div>
         </div>
         <div className="select-none font-semibold text-sm rounded-2xl py-2 flex gap-2 items-center">
@@ -86,5 +78,30 @@ const CartItem: React.FC<CartItemProps> = ({
     </div>
   );
 };
+
+CartItem.fragment = gql`
+  fragment CartItemFragment on Product {
+    id
+    name
+    description
+    price
+    inStock
+    discount
+    brand {
+      name
+      slug
+    }
+    category {
+      name
+      slug
+    }
+    images(limit: 1) {
+      caption
+      alternativeText
+      url
+      formats
+    }
+  }
+`;
 
 export default CartItem;

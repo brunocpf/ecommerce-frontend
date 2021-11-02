@@ -15,7 +15,7 @@ const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
           'ring-2',
           'border-none',
           'focus:ring-2',
-          'focus:ring-emerald-500',
+          'focus:ring-indigo-500',
           'focus:outline-none',
           {
             ['ring-red-500']: error,

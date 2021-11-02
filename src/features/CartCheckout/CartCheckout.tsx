@@ -1,6 +1,5 @@
 import { ErrorMessage } from '@hookform/error-message';
 import ActionButton from 'components/ActionButton';
-import Spinner from 'components/Spinner';
 import TextInput from 'components/TextInput/TextInput';
 import { useForm } from 'react-hook-form';
 import debounce from 'lodash.debounce';
@@ -43,7 +42,6 @@ const CartCheckout: React.FC<CartCheckoutProps> = () => {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
     getValues,
     setValue,
   } = useForm<CartCheckoutFormValues>();
@@ -195,8 +193,13 @@ const CartCheckout: React.FC<CartCheckoutProps> = () => {
           />
         </div>
 
-        <button type="submit">Comprar</button>
-
+        <ActionButton
+          variant="secondary"
+          className="w-full text-lg"
+          type="submit"
+        >
+          Comprar
+        </ActionButton>
         {/* <div className="w-full p-10 flex flex-col items-center justify-center">
           {loading ? (
             <Spinner className="w-20 h-20" />

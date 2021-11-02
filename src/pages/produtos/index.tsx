@@ -2,7 +2,7 @@ import Page from 'components/Page';
 import config from 'config';
 import { NextPage } from 'next';
 import SearchScene from 'scenes/SearchScene';
-import withApollo from 'util/withApollo';
+import { withApollo } from 'apollo/withApollo';
 
 const SearchPage: NextPage = () => {
   return (

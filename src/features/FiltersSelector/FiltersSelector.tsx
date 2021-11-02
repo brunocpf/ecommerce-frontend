@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import useQueryFilters from './useQueryFilters';
 import { MouseEventHandler } from 'react';
 import useQueryString from 'util/useQueryString';
+import ActionButton from 'components/ActionButton';
 
 const FILTER_OPTIONS_QUERY = gql`
   query FilterOptionsQuery {
@@ -44,6 +45,7 @@ const FiltersSelector: React.FC<FiltersSelectorProps> = ({
   const { data } = useQuery<FilterOptionsQuery>(FILTER_OPTIONS_QUERY);
   const { push, query } = useRouter();
   const search = useQueryString('search');
+  const sort = useQueryString('sort');
 
   const defaultValues = useQueryFilters();
 
@@ -56,10 +58,12 @@ const FiltersSelector: React.FC<FiltersSelectorProps> = ({
 
     onClickFilter?.();
 
-    push('/produtos', {
+    push({
+      pathname: '/produtos',
       query: {
         ...query,
         search,
+        sort,
         filters: encodedFilters,
       },
     });
@@ -82,7 +86,8 @@ const FiltersSelector: React.FC<FiltersSelectorProps> = ({
 
     onClickClear?.();
 
-    push('/produtos', {
+    push({
+      pathname: '/produtos',
       query: {},
     });
   };
@@ -155,19 +160,21 @@ const FiltersSelector: React.FC<FiltersSelectorProps> = ({
         </section>
 
         <div className="flex flex-col gap-2">
-          <button
-            className="w-full h-full p-2 rounded text-white bg-gray-400 active:opacity-80 hover:opacity-50 transition-opacity"
+          <ActionButton
+            className="w-full h-full"
             onClick={onClear}
             type="reset"
+            variant="default"
           >
             Limpar Filtros
-          </button>
-          <button
-            className="w-full h-full p-2 rounded text-white bg-emerald-500 active:opacity-80 hover:opacity-50 transition-opacity"
+          </ActionButton>
+          <ActionButton
+            className="w-full h-full"
             type="submit"
+            variant="primary"
           >
             Buscar
-          </button>
+          </ActionButton>
         </div>
       </div>
     </form>

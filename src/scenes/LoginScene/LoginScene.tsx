@@ -4,6 +4,7 @@ import { RegisterForm } from 'features/Register';
 import ActionButton from 'components/ActionButton';
 import { useRouter } from 'next/router';
 import Spinner from 'components/Spinner';
+import Container from 'components/Container';
 
 export interface LoginSceneProps {}
 
@@ -30,7 +31,7 @@ const LoginScene: React.FC<LoginSceneProps> = () => {
     );
 
   return (
-    <div className="my-4 flex flex-col md:flex-row gap-4 divide-y-2 md:divide-x-2 md:divide-y-0 relative">
+    <Container className="my-4 flex bg-white rounded shadow p-4 flex-col md:flex-row gap-4 divide-y-2 md:divide-x-2 md:divide-y-0 relative">
       {loggedIn ? (
         <div className="w-full">
           <div className="w-full flex items-center justify-center font-bold">
@@ -71,7 +72,7 @@ const LoginScene: React.FC<LoginSceneProps> = () => {
           </div>
         </>
       )}
-    </div>
+    </Container>
   );
 };
 

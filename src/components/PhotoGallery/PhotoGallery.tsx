@@ -136,9 +136,9 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
               key={i}
               className={`${
                 imageIndex === i
-                  ? 'bg-white border-gray-200 border-2'
-                  : 'bg-gray-200'
-              } h-6 w-6 rounded-full active:opacity-80 hover:opacity-50 cursor-pointer transition-opacity`}
+                  ? 'bg-white border-indigo-800 border-2'
+                  : 'bg-indigo-800'
+              } h-6 w-16 rounded-full active:opacity-80 hover:opacity-50 cursor-pointer transition-opacity`}
               onClick={() => {
                 if (imageIndex != i) setPage([i, imageIndex > i ? -1 : 1]);
               }}

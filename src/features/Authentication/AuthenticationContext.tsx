@@ -74,23 +74,6 @@ export const AuthenticationProvider: React.FC = ({ children }) => {
     }
   }, [data, error, logout]);
 
-  // useEffect(() => {
-  //   apolloClient
-  //     .query<MeQuery>({
-  //       query: ME_QUERY,
-  //     })
-  //     .then(({ data, errors }) => {
-  //       if (errors) {
-  //         logout();
-  //       } else {
-  //         setUserData(data?.me?.user ?? null);
-  //       }
-  //     })
-  //     .catch(() => {
-  //       logout();
-  //     });
-  // }, [logout]);
-
   return (
     <AuthenticationContext.Provider
       value={{

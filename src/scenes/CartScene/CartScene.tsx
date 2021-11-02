@@ -4,35 +4,19 @@ import { useMemo } from 'react';
 import { CartItemsQuery, CartItemsQueryVariables } from 'api';
 import Spinner from 'components/Spinner';
 import CartItem from './CartItem';
-import getAbsoluteImageUrl from 'util/getAbsoluteImageUrl';
 import currencyFormatter from 'util/currencyFormatter';
 import Link from 'next/link';
 import ActionButton from 'components/ActionButton';
 import { useAuthenticationContext } from 'features/Authentication';
 import CartCheckout from 'features/CartCheckout';
+import Container from 'components/Container';
 
 const CART_ITEMS_QUERY = gql`
+  ${CartItem.fragment}
+
   query CartItemsQuery($ids: [ID!]) {
     products(where: { id_in: $ids, inStock: true }) {
-      id
-      name
-      description
-      price
-      inStock
-      brand {
-        name
-        slug
-      }
-      category {
-        name
-        slug
-      }
-      images {
-        caption
-        alternativeText
-        url
-        formats
-      }
+      ...CartItemFragment
     }
   }
 `;
@@ -75,29 +59,14 @@ const CartScene: React.FC<CartSceneProps> = () => {
   }
 
   return (
-    <div className="my-4 flex flex-col gap-4 md:flex-row">
+    <Container className="my-4 flex flex-col gap-4 md:flex-row">
       <section className="md:flex-1">
         <h6 className="text-lg font-bold">Carrinho</h6>
         {ids.length <= 0 ? (
           <span>Nenhum produto adicionado</span>
         ) : (
           <div className="flex gap-2 flex-col">
-            {data?.products?.map(p => (
-              <CartItem
-                key={p?.id}
-                id={p?.id ?? ''}
-                name={p?.name ?? ''}
-                image={{
-                  alt: p?.images?.[0]?.alternativeText ?? '',
-                  caption: p?.images?.[0]?.caption ?? '',
-                  url: getAbsoluteImageUrl(
-                    p?.images?.[0]?.formats?.thumbnail?.url ?? '',
-                  ),
-                }}
-                price={p?.price ?? 0}
-                brand={p?.brand?.name ?? ''}
-              />
-            ))}
+            {data?.products?.map(p => p && <CartItem product={p} key={p.id} />)}
           </div>
         )}
         {ids.length > 0 && (
@@ -112,14 +81,14 @@ const CartScene: React.FC<CartSceneProps> = () => {
         <p className="text-xs mb-2 mt-2">
           {'>> '}
           <Link href="/produtos" passHref>
-            <a className="text-emerald-500 font-bold underline">
+            <a className="text-orange-500 font-bold underline">
               Retornar para os produtos
             </a>
           </Link>
         </p>
       </section>
       {ids.length > 0 && (
-        <section className="md:flex-1 p-8 bg-gray-200 rounded">
+        <section className="md:flex-1 p-8 bg-white rounded">
           {authenticating ? (
             <Spinner className="h-20 w-20" />
           ) : !loggedIn ? (
@@ -132,7 +101,7 @@ const CartScene: React.FC<CartSceneProps> = () => {
                 }}
                 passHref
               >
-                <a className="text-emerald-500 font-bold underline">
+                <a className="text-orange-500 font-bold underline">
                   faça o login
                 </a>
               </Link>
@@ -152,7 +121,7 @@ const CartScene: React.FC<CartSceneProps> = () => {
           )}
         </section>
       )}
-    </div>
+    </Container>
   );
 };
 

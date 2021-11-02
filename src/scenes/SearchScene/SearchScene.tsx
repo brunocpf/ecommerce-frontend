@@ -1,9 +1,6 @@
 import { gql, useQuery } from '@apollo/client';
 import { SearchProductsQuery, SearchProductsQueryVariables } from 'api';
 import ResponsiveList from 'components/ResponsiveList';
-import ProductThumbnail from 'features/ProductThumbnail';
-import ProductThumbnailDataFragment from 'fragments/ProductThumbnailDataFragment';
-import getAbsoluteImageUrl from 'util/getAbsoluteImageUrl';
 import {
   AdjustmentsIcon,
   ChevronDoubleLeftIcon,
@@ -19,11 +16,16 @@ import SearchBar, { useQuerySearch } from 'features/SearchBar';
 import Drawer from 'components/Drawer';
 import useQuerySearchPage from 'features/SearchBar/useQuerySearchPage';
 import Link from 'next/link';
+import ProductThumbnail from 'features/ProductThumbnail';
+import Container from 'components/Container';
+import ButtonBase from 'components/ButtonBase';
+import useQuerySort from '../../features/SortButton/useQuerySort';
+import SortButton from 'features/SortButton';
 
 export interface HomeSceneProps {}
 
 const SEARCH_PRODUCTS_QUERY = gql`
-  ${ProductThumbnailDataFragment}
+  ${ProductThumbnail.fragment}
 
   query SearchProductsQuery(
     $search: String = ""
@@ -31,6 +33,7 @@ const SEARCH_PRODUCTS_QUERY = gql`
     $categories: [String]
     $inStock: [Boolean] = [true, false]
     $start: Int = 0
+    $sort: String = "featured:desc"
   ) {
     searchResults: products(
       where: {
@@ -39,11 +42,11 @@ const SEARCH_PRODUCTS_QUERY = gql`
         category: { slug_in: $categories }
         inStock_in: $inStock
       }
-      sort: "featured:desc,updatedAt:desc"
+      sort: $sort
       limit: 8
       start: $start
     ) {
-      ...ProductThumbnailDataFragment
+      ...ProductThumbnailFragment
     }
 
     count: productsCount(
@@ -57,26 +60,12 @@ const SEARCH_PRODUCTS_QUERY = gql`
   }
 `;
 
-// featuredProducts: products(
-//   where: { featured: true, inStock: true }
-//   sort: "updatedAt:desc"
-//   limit: 4
-// ) {
-//   ...ProductThumbnailDataFragment
-// }
-// latestProducts: products(
-//   where: { inStock: true }
-//   sort: "createdAt:desc"
-//   limit: 4
-// ) {
-//   ...ProductThumbnailDataFragment
-// }
-
 const SearchScene: React.FC<HomeSceneProps> = () => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const queryFilters = useQueryFilters();
   const querySearch = useQuerySearch();
   const queryPage = useQuerySearchPage();
+  const querySort = useQuerySort();
   const startOffset = (queryPage - 1) * 8;
 
   const queryObject = useMemo(() => {
@@ -85,8 +74,9 @@ const SearchScene: React.FC<HomeSceneProps> = () => {
         ? encodeURIComponent(JSON.stringify(queryFilters))
         : '',
       search: encodeURIComponent(querySearch?.search ?? ''),
+      sort: querySort,
     };
-  }, [queryFilters, querySearch?.search]);
+  }, [queryFilters, querySearch?.search, querySort]);
 
   const categories = useMemo(() => {
     if (!queryFilters?.categories) return undefined;
@@ -119,6 +109,7 @@ const SearchScene: React.FC<HomeSceneProps> = () => {
       categories,
       inStock: queryFilters?.showOutOfStockItems ? [true, false] : [true],
       start: startOffset,
+      sort: `featured:desc,${querySort ? querySort : 'updatedAt:desc'}`,
     },
   });
 
@@ -133,15 +124,17 @@ const SearchScene: React.FC<HomeSceneProps> = () => {
     );
 
   return (
-    <div className="my-4 flex gap-4">
+    <Container className="my-4 flex gap-4">
       <Drawer open={drawerIsOpen} onClose={() => setDrawerIsOpen(false)}>
         <FiltersSelector
           onClickClear={() => setDrawerIsOpen(false)}
           onClickFilter={() => setDrawerIsOpen(false)}
         />
       </Drawer>
-      <div className="hidden md:block pr-8 border-r-2 border-gray-200">
-        <FiltersSelector />
+      <div className="hidden md:block">
+        <div className="p-4 bg-white rounded shadow">
+          <FiltersSelector />
+        </div>
       </div>
       <div className="flex-1">
         <div className="flex items-center gap-3 mb-5">
@@ -152,6 +145,9 @@ const SearchScene: React.FC<HomeSceneProps> = () => {
             <AdjustmentsIcon className="h-6 w-6" />
           </button>
           <SearchBar />
+        </div>
+        <div className="mb-5 w-full flex">
+          <SortButton />
         </div>
         <section className="mb-4">
           {loading ? (
@@ -180,24 +176,9 @@ const SearchScene: React.FC<HomeSceneProps> = () => {
                 )}
               </h1>
               <ResponsiveList>
-                {data?.searchResults?.map(p => (
-                  <ProductThumbnail
-                    key={p?.id}
-                    id={p?.id ?? ''}
-                    name={p?.name ?? ''}
-                    image={{
-                      alt: p?.images?.[0]?.alternativeText ?? '',
-                      caption: p?.images?.[0]?.caption ?? '',
-                      url: getAbsoluteImageUrl(
-                        p?.images?.[0]?.formats?.thumbnail?.url ?? '',
-                      ),
-                    }}
-                    price={p?.price ?? 0}
-                    featured={p?.featured ?? false}
-                    brand={p?.brand?.name ?? ''}
-                    inStock={p?.inStock ?? false}
-                  />
-                ))}
+                {data?.searchResults?.map(
+                  p => p && <ProductThumbnail key={p?.id} product={p} />,
+                )}
               </ResponsiveList>
               <div className="mt-4 w-full flex justify-center items-center select-none">
                 <Link
@@ -211,13 +192,13 @@ const SearchScene: React.FC<HomeSceneProps> = () => {
                   passHref
                   scroll={false}
                 >
-                  <a
-                    className={`flex items-center justify-center gap-2 active:opacity-80 hover:opacity-50 cursor-pointer transition-opacity ${
-                      queryPage <= 1 ? 'pointer-events-none text-gray-200' : ''
+                  <ButtonBase
+                    className={`text-orange-500 ${
+                      queryPage <= 1 ? 'pointer-events-none opacity-40' : ''
                     }`}
                   >
                     <ChevronDoubleLeftIcon className="h-8 w-8" />
-                  </a>
+                  </ButtonBase>
                 </Link>
                 <Link
                   href={{
@@ -230,13 +211,13 @@ const SearchScene: React.FC<HomeSceneProps> = () => {
                   passHref
                   scroll={false}
                 >
-                  <a
-                    className={`flex items-center justify-center gap-2 active:opacity-80 hover:opacity-50 cursor-pointer transition-opacity ${
-                      queryPage <= 1 ? 'pointer-events-none text-gray-200' : ''
+                  <ButtonBase
+                    className={`text-orange-500 ${
+                      queryPage <= 1 ? 'pointer-events-none opacity-40' : ''
                     }`}
                   >
                     <ChevronLeftIcon className="h-8 w-8" />
-                  </a>
+                  </ButtonBase>
                 </Link>
                 Página {queryPage}
                 <Link
@@ -250,15 +231,16 @@ const SearchScene: React.FC<HomeSceneProps> = () => {
                   passHref
                   scroll={false}
                 >
-                  <a
-                    className={`flex items-center justify-center gap-2 active:opacity-80 hover:opacity-50 cursor-pointer transition-opacity ${
+                  <ButtonBase
+                    component="a"
+                    className={`text-orange-500 ${
                       queryPage >= lastPage
-                        ? 'pointer-events-none text-gray-200'
+                        ? 'pointer-events-none opacity-40'
                         : ''
                     }`}
                   >
                     <ChevronRightIcon className="h-8 w-8" />
-                  </a>
+                  </ButtonBase>
                 </Link>
                 <Link
                   href={{
@@ -271,22 +253,22 @@ const SearchScene: React.FC<HomeSceneProps> = () => {
                   passHref
                   scroll={false}
                 >
-                  <a
-                    className={`flex items-center justify-center gap-2 active:opacity-80 hover:opacity-50 cursor-pointer transition-opacity ${
+                  <ButtonBase
+                    className={`text-orange-500 ${
                       queryPage >= lastPage
-                        ? 'pointer-events-none text-gray-200'
+                        ? 'pointer-events-none opacity-40'
                         : ''
                     }`}
                   >
                     <ChevronDoubleRightIcon className="h-8 w-8" />
-                  </a>
+                  </ButtonBase>
                 </Link>
               </div>
             </>
           )}
         </section>
       </div>
-    </div>
+    </Container>
   );
 };
 

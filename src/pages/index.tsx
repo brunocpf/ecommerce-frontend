@@ -1,8 +1,9 @@
+import getStaticApolloProps from 'apollo/getStaticApolloProps';
+import { withApollo } from 'apollo/withApollo';
 import Page from 'components/Page';
 import config from 'config';
 import { NextPage } from 'next';
 import HomeScene from 'scenes/HomeScene';
-import withApollo from 'util/withApollo';
 
 const HomePage: NextPage = () => {
   return (
@@ -12,4 +13,8 @@ const HomePage: NextPage = () => {
   );
 };
 
-export default withApollo({ ssr: true })(HomePage);
+export default withApollo({ ssr: false })(HomePage);
+
+export const getStaticProps = getStaticApolloProps<{}, {}>(HomePage, {
+  revalidate: 10,
+});

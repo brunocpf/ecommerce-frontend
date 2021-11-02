@@ -12,12 +12,11 @@ export type ButtonBaseProps<
   P = {},
 > = OverrideProps<ButtonBaseTypeMap<P, D>, D>;
 
-function ButtonBase<T extends React.ElementType = 'button'>({
-  className,
-  component = 'button',
-  ...rest
-}: ButtonBaseProps<T, {}>) {
-  const Component = component;
+function ButtonBase<T extends React.ElementType = 'button'>(
+  { className, component, ...rest }: ButtonBaseProps<T, { component?: T }>,
+  ref: React.ForwardedRef<HTMLButtonElement>,
+) {
+  const Component = component ?? 'button';
 
   return (
     <Component
@@ -28,8 +27,18 @@ function ButtonBase<T extends React.ElementType = 'button'>({
         'disabled:opacity-40',
       )} ${className ?? ''}`}
       {...rest}
+      ref={ref}
     />
   );
 }
 
-export default ButtonBase;
+export default React.forwardRef(ButtonBase) as <
+  T extends React.ElementType = 'button',
+>(
+  props: ButtonBaseProps<
+    T,
+    {
+      component?: T | undefined;
+    }
+  >,
+) => JSX.Element;

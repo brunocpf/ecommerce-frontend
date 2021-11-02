@@ -5,7 +5,7 @@ import config from 'config';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import ProductScene from 'scenes/ProductScene';
-import withApollo from 'util/withApollo';
+import { withApollo } from 'apollo/withApollo';
 
 export interface ProductPageProps {}
 

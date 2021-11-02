@@ -145,6 +145,7 @@ export interface CartItemsQuery_products {
   description: string | null;
   price: number;
   inStock: boolean;
+  discount: number | null;
   brand: CartItemsQuery_products_brand | null;
   category: CartItemsQuery_products_category | null;
   images: (CartItemsQuery_products_images | null)[] | null;
@@ -156,6 +157,106 @@ export interface CartItemsQuery {
 
 export interface CartItemsQueryVariables {
   ids?: string[] | null;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL query operation: HomePageQuery
+// ====================================================
+
+export interface HomePageQuery_featuredProducts_brand {
+  __typename: "Brand";
+  name: string | null;
+  slug: string;
+}
+
+export interface HomePageQuery_featuredProducts_images {
+  __typename: "UploadFile";
+  caption: string | null;
+  alternativeText: string | null;
+  formats: any | null;
+}
+
+export interface HomePageQuery_featuredProducts {
+  __typename: "Product";
+  id: string;
+  name: string;
+  price: number;
+  inStock: boolean;
+  discount: number | null;
+  createdAt: any;
+  featured: boolean | null;
+  brand: HomePageQuery_featuredProducts_brand | null;
+  images: (HomePageQuery_featuredProducts_images | null)[] | null;
+}
+
+export interface HomePageQuery_latestProducts_brand {
+  __typename: "Brand";
+  name: string | null;
+  slug: string;
+}
+
+export interface HomePageQuery_latestProducts_images {
+  __typename: "UploadFile";
+  caption: string | null;
+  alternativeText: string | null;
+  formats: any | null;
+}
+
+export interface HomePageQuery_latestProducts {
+  __typename: "Product";
+  id: string;
+  name: string;
+  price: number;
+  inStock: boolean;
+  discount: number | null;
+  createdAt: any;
+  featured: boolean | null;
+  brand: HomePageQuery_latestProducts_brand | null;
+  images: (HomePageQuery_latestProducts_images | null)[] | null;
+}
+
+export interface HomePageQuery_deals_brand {
+  __typename: "Brand";
+  name: string | null;
+  slug: string;
+}
+
+export interface HomePageQuery_deals_images {
+  __typename: "UploadFile";
+  caption: string | null;
+  alternativeText: string | null;
+  formats: any | null;
+}
+
+export interface HomePageQuery_deals {
+  __typename: "Product";
+  id: string;
+  name: string;
+  price: number;
+  inStock: boolean;
+  discount: number | null;
+  createdAt: any;
+  featured: boolean | null;
+  brand: HomePageQuery_deals_brand | null;
+  images: (HomePageQuery_deals_images | null)[] | null;
+}
+
+export interface HomePageQuery_categories {
+  __typename: "Category";
+  name: string;
+  slug: string;
+}
+
+export interface HomePageQuery {
+  featuredProducts: (HomePageQuery_featuredProducts | null)[] | null;
+  latestProducts: (HomePageQuery_latestProducts | null)[] | null;
+  deals: (HomePageQuery_deals | null)[] | null;
+  categories: (HomePageQuery_categories | null)[] | null;
 }
 
 /* tslint:disable */
@@ -235,8 +336,10 @@ export interface SearchProductsQuery_searchResults {
   id: string;
   name: string;
   price: number;
-  featured: boolean | null;
   inStock: boolean;
+  discount: number | null;
+  createdAt: any;
+  featured: boolean | null;
   brand: SearchProductsQuery_searchResults_brand | null;
   images: (SearchProductsQuery_searchResults_images | null)[] | null;
 }
@@ -252,6 +355,42 @@ export interface SearchProductsQueryVariables {
   categories?: (string | null)[] | null;
   inStock?: (boolean | null)[] | null;
   start?: number | null;
+  sort?: string | null;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL fragment: ProductThumbnailFragment
+// ====================================================
+
+export interface ProductThumbnailFragment_brand {
+  __typename: "Brand";
+  name: string | null;
+  slug: string;
+}
+
+export interface ProductThumbnailFragment_images {
+  __typename: "UploadFile";
+  caption: string | null;
+  alternativeText: string | null;
+  formats: any | null;
+}
+
+export interface ProductThumbnailFragment {
+  __typename: "Product";
+  id: string;
+  name: string;
+  price: number;
+  inStock: boolean;
+  discount: number | null;
+  createdAt: any;
+  featured: boolean | null;
+  brand: ProductThumbnailFragment_brand | null;
+  images: (ProductThumbnailFragment_images | null)[] | null;
 }
 
 /* tslint:disable */
@@ -285,6 +424,48 @@ export interface ProductThumbnailDataFragment {
   inStock: boolean;
   brand: ProductThumbnailDataFragment_brand | null;
   images: (ProductThumbnailDataFragment_images | null)[] | null;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL fragment: CartItemFragment
+// ====================================================
+
+export interface CartItemFragment_brand {
+  __typename: "Brand";
+  name: string | null;
+  slug: string;
+}
+
+export interface CartItemFragment_category {
+  __typename: "Category";
+  name: string;
+  slug: string;
+}
+
+export interface CartItemFragment_images {
+  __typename: "UploadFile";
+  caption: string | null;
+  alternativeText: string | null;
+  url: string;
+  formats: any | null;
+}
+
+export interface CartItemFragment {
+  __typename: "Product";
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  inStock: boolean;
+  discount: number | null;
+  brand: CartItemFragment_brand | null;
+  category: CartItemFragment_category | null;
+  images: (CartItemFragment_images | null)[] | null;
 }
 
 /* tslint:disable */

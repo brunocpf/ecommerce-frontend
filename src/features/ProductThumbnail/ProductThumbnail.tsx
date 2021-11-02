@@ -1,79 +1,137 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { StarIcon } from '@heroicons/react/outline';
-import { classnames } from 'tailwindcss-classnames';
 import currencyFormatter from 'util/currencyFormatter';
+import gql from 'graphql-tag';
+import Container from 'components/Container';
+import ActionButton from 'components/ActionButton';
+import calculatePrice from 'util/calculatePrice';
+import { ProductThumbnailFragment } from 'api';
+import getAbsoluteImageUrl from 'util/getAbsoluteImageUrl';
+import { StarIcon } from '@heroicons/react/outline';
+import { useCartContext } from 'features/Cart';
+import { useRouter } from 'next/router';
 
 export interface ProductThumbnailProps {
-  id: string;
-  name: string;
-  price: number;
-  featured: boolean;
-  inStock: boolean;
-  brand?: string;
-  image: {
-    alt: string;
-    caption: string;
-    url: string;
-  };
+  product: ProductThumbnailFragment;
 }
 
-const ProductThumbnail: React.FC<ProductThumbnailProps> = ({
-  id,
-  name,
-  price,
-  featured,
-  brand,
-  image,
-  inStock,
+const ProductThumbnail: ComponentWithFragment<ProductThumbnailProps> = ({
+  product: {
+    id,
+    name,
+    price,
+    brand,
+    images,
+    inStock,
+    createdAt,
+    discount,
+    featured,
+  },
 }) => {
+  const { addItem } = useCartContext();
+  const finalPrice = calculatePrice(price, discount);
+  const originalFormattedPrice = currencyFormatter.format(price);
+  const formattedPrice = currencyFormatter.format(finalPrice);
+  const { push } = useRouter();
+
+  const lastWeek = new Date();
+  lastWeek.setDate(lastWeek.getDate() - 7);
+
+  const isNew = new Date(createdAt) >= lastWeek;
+  const image = images?.[0];
+
+  const addToCart = () => {
+    addItem(id, 1);
+    push('/carrinho');
+  };
+
   return (
-    <Link
-      href={{
-        pathname: '/produtos/[id]',
-        query: { id },
-      }}
-      passHref
-    >
-      <a className="bg-red-500">
-        <div className="relative flex flex-col gap-2 w-full rounded-3xl p-8 shadow border-gray-200 hover:opacity-50 active:opacity-80 transition-opacity">
-          <div className="flex items-center justify-center w-full">
-            <div className="w-36 h-36 relative mb-4">
-              <Image
-                className="pointer-events-none"
-                src={image.url}
-                alt={image.alt}
-                layout="fill"
-              />
-            </div>
+    <Container className="bg-white py-4 shadow rounded-md flex flex-col">
+      <div className="h-9 flex justify-between">
+        {discount && (
+          <div className="rounded-3xl bg-indigo-800 text-white text-sm p-2 w-max">{`-${
+            discount * 100
+          }%`}</div>
+        )}
+        {isNew && (
+          <div className="rounded-3xl ring ring-orange-500 text-orange-500 font-bold text-sm p-2 w-max">
+            NOVO
           </div>
-          <div className="flex-1">
-            <div className="text-xs">{brand ?? '-'}</div>
-            <p className="text-lg font-bold line-clamp-2">{name}</p>
-            <div className="w-full mt-4 flex justify-between gap-2 items-center">
-              <div>
-                <div className="text-xs text-gray-300">Preço</div>
-                <div
-                  className={classnames('font-bold', 'relative', {
-                    'text-red-500': !inStock,
-                    'text-sm': !inStock,
-                  })}
-                >
-                  {inStock ? currencyFormatter.format(price) : 'Indisponível'}
-                </div>
-              </div>
-            </div>
+        )}
+      </div>
+      <div className="flex items-center justify-center w-full relative">
+        <Link
+          href={{
+            pathname: '/produtos/[id]',
+            query: { id },
+          }}
+        >
+          <a className="w-36 h-36 relative mb-4">
+            <Image
+              className="pointer-events-none"
+              src={getAbsoluteImageUrl(image?.formats?.thumbnail?.url ?? '')}
+              alt={image?.alternativeText ?? ''}
+              layout="fill"
+            />
+          </a>
+        </Link>
+        {featured && (
+          <div className="absolute -right-2 -top-2 flex flex-col items-center text-orange-500">
+            <StarIcon className="h-6 w-6" />
           </div>
-          {featured && (
-            <div className="absolute right-4 top-4 flex flex-col items-center text-emerald-500">
-              <StarIcon className="h-6 w-6" />
-              <label className="text-xs">Destaque</label>
-            </div>
-          )}
+        )}
+      </div>
+      <Link
+        href={{
+          pathname: '/produtos/[id]',
+          query: { id },
+        }}
+      >
+        <a className="flex justify-center items-center flex-col" title={name}>
+          <div className="text-xs">{brand?.name ?? '-'}</div>
+          <p className="text-lg font-bold line-clamp-1">{name}</p>
+        </a>
+      </Link>
+      <div className="flex items-center justify-center flex-col font-bold py-4">
+        <div className="text-orange-500 text-2xl">{formattedPrice}</div>
+
+        <div className="text-indigo-900 line-through text-md h-6">
+          {discount ? originalFormattedPrice : ' '}
         </div>
-      </a>
-    </Link>
+      </div>
+      <div className="flex items-center justify-center">
+        <ActionButton
+          variant={inStock ? 'primary' : 'error'}
+          className="text-sm disabled:opacity-100"
+          disabled={!inStock}
+          onClick={addToCart}
+        >
+          {inStock ? 'Adicionar ao carrinho' : 'Indisponível'}
+        </ActionButton>
+      </div>
+    </Container>
   );
 };
+
+ProductThumbnail.fragment = gql`
+  fragment ProductThumbnailFragment on Product {
+    id
+    name
+    price
+    inStock
+    discount
+    createdAt
+    featured
+    brand {
+      name
+      slug
+    }
+    images(limit: 1) {
+      caption
+      alternativeText
+      formats
+    }
+  }
+`;
 
 export default ProductThumbnail;
